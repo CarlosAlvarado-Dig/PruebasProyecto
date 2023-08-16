@@ -10,12 +10,28 @@ export function Counter() {
     const [isEditorLoading, setIsEditorLoading] = useState(true);
 
     const exportHtml = () => {
-        emailEditorRef.current.editor.exportHtml((data) => {
-            const { design, html } = data;
-            console.log('exportHtml', html);
-            // save para el "usuario", donde el le de para guardar su diseno 
+            //const { design, html } = data;
+            ////console.log('exportHtml', html);
+            //var imageUrl = data.url;
+            //console.log('exportImage', imageUrl);
+            // save para el "usuario", donde el le de para guardar su diseno
             // aqui mandar el html/json para almacenarlo en la nube/base de datos/ data.
-        });
+
+            const options = {
+                method: 'POST',
+                headers: { accept: 'application/json', 'content-type': 'application/json' },
+                body: JSON.stringify({
+                    displayMode: 'email',
+                    design: {},
+                    mergeTags: { first_name: 'John', last_name: 'Doe' },
+                    fullPage: true
+                })
+            };
+
+            fetch('https://api.unlayer.com/v2/export/image', options)
+                .then(response => response.json())
+                .then(response => console.log(response))
+                .catch(err => console.error(err));
     };
 
     const onLoad = () => {
@@ -31,14 +47,12 @@ export function Counter() {
         // si viene vacios, dejarlo en blanco. OOOOO uno con fondo blanco.
         emailEditorRef.current.editor.loadDesign(sample);
         emailEditorRef.current.setMergeTags({
-            img_logo: {
-                name: "Logo",
-                value: "{{img_logo}}",
-                sample: "https://via.placeholder.com/500x100?text=IMAGE"
+            prueba: {
+                name: "PRUEBA",
+                value: "<var> RTaxId </var>",
+                sample: "PRUEBA"
             }
         })
-
-
     };
         
     const onReady = () => {
@@ -49,19 +63,36 @@ export function Counter() {
 
 
     return (
-        <>
+        
+        <html>
+            <div>
+                <button onClick={exportHtml}>Export Image</button>
+            </div>
+            <br></br>
             <EmailEditor
                 ref={emailEditorRef}
                 onLoad={onLoad}
                 options={{
                     mergeTags: {
-                        img_logo: {
-                            name: "Logo",
-                            value: "{{img_logo}}",
+                        prueba: {
+                            name: "PRUEBA",
+                            value: "<var> RTaxId </var>",
                         },
                     }
                 }}
+                appearance={{
+                    theme: 'dark',
+                    panels: {
+                        tools: {
+                            dock: 'right',
+                            collapsible: true
+                        }
+                    }
+                }}
+                features={{
+                    sendTestEmail: true
+                }}
             />
-        </>
+        </html>
     );
 }
