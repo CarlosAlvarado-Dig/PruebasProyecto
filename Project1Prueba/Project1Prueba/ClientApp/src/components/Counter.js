@@ -1,22 +1,25 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './style.css';
 import sample from './sample.json';
+//import sample2 from './sample2.html';
 import EmailEditor from 'react-email-editor';
 
 
-export function Counter() {
+export function Counter({ template }) {
     const emailEditorRef = useRef(null);
     const [isEditorLoading, setIsEditorLoading] = useState(true);
-
     const exportHtml = () => {
         emailEditorRef.current.editor.exportHtml((data) => {
             const { design, html } = data;
-            console.log('exportHtml', html);
+            console.log('JSON', design);
+            console.log('html', html);
+            //sample2 = design;
+            download(JSON.stringify(design), "template.json", "text/plain");
+            //convertHtml_png(html);
             // save para el "usuario", donde el le de para guardar su diseno
             // aqui mandar el html/json para almacenarlo en la nube/base de datos/ data.
         });
-    };
-
+    };    
     const onLoad = () => {
         // editor instance is created
         // you can load your template here;
@@ -28,7 +31,8 @@ export function Counter() {
 
         // conectarnos a la base de datos y en base al ID del diseno, traer el json/html y cargarlos.
         // si viene vacios, dejarlo en blanco. OOOOO uno con fondo blanco.
-        //emailEditorRef.current.editor.loadDesign(sample);
+        
+        //emailEditorRef.current.editor.loadDesign(container.innerHTML);
         emailEditorRef.current.setMergeTags({
             prueba: {
                 name: "PRUEBA",
@@ -36,7 +40,16 @@ export function Counter() {
                 sample: "PRUEBA"
             }
         })
+        console.log(window.location.protocol + '//' + window.location.host + '/custom.js');
     };
+    function download(content, fileName, contentType) {
+        const a = document.createElement("a");
+        const file = new Blob([content], { type: contentType });
+        a.href = window.URL.createObjectURL(file);
+        a.download = fileName;
+        a.click();
+    }
+
         
     const onReady = () => {
         // editor is ready
@@ -47,6 +60,7 @@ export function Counter() {
             emailEditorRef.current.editor.loadDesign(sample);
         }
     };
+
 
 
     return (
@@ -77,6 +91,7 @@ export function Counter() {
             <EmailEditor
                 ref={emailEditorRef}
                 onLoad={onLoad}
+                projectId={1071}
                 options={{
                     mergeTags: {
                         prueba: {
@@ -84,6 +99,11 @@ export function Counter() {
                             value: "<var> RTaxId </var>",
                         },
                     }
+                }}
+                options={{
+                    customJS: [
+                        window.location.protocol + '//' + window.location.host + '/custom.js',
+                    ]
                 }}
                 appearance={{
                     theme: 'dark',
@@ -94,9 +114,7 @@ export function Counter() {
                         }
                     }
                 }}
-                features={{
-                    sendTestEmail: true
-                }}
+
             />
         </div>
     );
